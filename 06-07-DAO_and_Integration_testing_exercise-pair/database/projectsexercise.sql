@@ -21,3 +21,13 @@ SELECT employee_id, department_id, first_name, last_name, birth_date, hire_date 
 SELECT employee_id, department_id, first_name, last_name, birth_date, hire_date FROM employee WHERE employee_id IN (SELECT employee_id FROM project_employee WHERE project_id = ?);
 
 UPDATE employee SET department_id = ? WHERE employee_id = ?;
+
+SELECT * FROM project;
+
+SELECT project_id, name, from_date, to_date FROM project WHERE from_date IS NOT NULL AND to_date IS NULL;
+
+SELECT * FROM project_employee;
+
+DELETE FROM project_employee WHERE employee_id = ? AND project_id = ?;
+
+INSERT INTO project_employee (project_id, employee_id) VALUES (?, ?);

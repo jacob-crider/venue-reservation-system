@@ -17,7 +17,7 @@ public class ExcelsiorCLI {
 	}
 
 	public ExcelsiorCLI(DataSource datasource) {
-		// create your DAOs here
+		// instantiate your DAOs here
 	}
 
 	public void run() {

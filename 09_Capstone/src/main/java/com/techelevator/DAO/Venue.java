@@ -58,4 +58,11 @@ public class Venue {
     public void setCityName(String cityName) {
         this.cityName = cityName;
     }
+
+    @Override
+    public String toString() {
+        Venue venue = new Venue();
+        return this.getName() + "\nLocation: " + this.getCityName() + ", " + this.getStateAbbreviation() + '\n' +
+        "Categories: " + this.getCategories() + "\n\n" + this.getDescription();
+    }
 }

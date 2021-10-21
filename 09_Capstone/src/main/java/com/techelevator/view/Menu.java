@@ -9,6 +9,11 @@ public class Menu {
 
     private static Scanner userInput = new Scanner(System.in);
 
+    public String inputFromUser() {
+        String userChoice = userInput.nextLine();
+        return userChoice;
+    }
+
     public void mainMenu() {
         System.out.println();
         System.out.println("What would you like to do?");
@@ -28,6 +33,23 @@ public class Menu {
             counter++;
         }
         System.out.printf("%20s", "R) Return to Previous Screen");
+        System.out.println();
+    }
+
+    public void displayChosenVenue(Venue venue) {
+        System.out.println(venue);
+    }
+
+    public void invalidInputMessage() {
+        System.out.println("Please enter a valid input.");
+    }
+
+    public void viewVenueSpacesMenu() {
+        System.out.println();
+        System.out.println("What would you like to do next?");
+        System.out.printf("%20s", "1) View Spaces");
+        System.out.println();
+        System.out.printf("%34s", "R) Return to Previous Screen");
         System.out.println();
     }
 

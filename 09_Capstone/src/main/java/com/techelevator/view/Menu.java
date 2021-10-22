@@ -82,9 +82,9 @@ public class Menu {
         System.out.println();
         System.out.println("The following spaces are available based on your needs: ");
         System.out.println();
-        System.out.println("Space #   Name            Daily Rate   Max Occup.   Accessible?   Total Cost");
+        System.out.println("Space #      Name                        Daily Rate       Max Occup.      Accessible?      Total Cost");
         for(Space space : spaceList) {
-            System.out.println(space.getSpaceId() + space.getName() + space.getDailyRate() + space.getMaxOccupancy() + space.isAccessible() + space.getDailyRate() * totalDaysNeeded);
+            System.out.println(space.availableSpaceFormat(space.getDailyRate(), totalDaysNeeded));
             System.out.println();
         }
     }
@@ -101,6 +101,12 @@ public class Menu {
 
     public String askUserForAttendees() {
         System.out.println("How many people will be in attendance?");
+        return inputFromUser();
+    }
+
+    public String reserveOrCancel() {
+        System.out.println();
+        System.out.println("Which space would you like to reserve?");
         return inputFromUser();
     }
 

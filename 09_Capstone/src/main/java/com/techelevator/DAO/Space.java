@@ -107,4 +107,13 @@ public class Space {
 
         return months.get(month);
     }
+
+    public String availableSpaceFormat(double rentalAmount, int daysRented) {
+       String spaceIdIndent = "             ";
+       String nameIndent = "                            ";
+       String dailyRateIndent = "                 ";
+       String maxOccupancyIndent = "                ";
+       String accessibleIndent = "                 ";
+       return this.getSpaceId() + (spaceIdIndent.substring(0, spaceIdIndent.length() - String.valueOf(getSpaceId()).length())) + this.getName() + nameIndent.substring(0, nameIndent.length() - this.getName().length()) + "$" + this.getDailyRate() + dailyRateIndent.substring(0, dailyRateIndent.length() - String.valueOf(this.getDailyRate()).length()) + this.getMaxOccupancy() + maxOccupancyIndent.substring(0, maxOccupancyIndent.length() - String.valueOf(this.getMaxOccupancy()).length()) + this.isAccessible() + accessibleIndent.substring(0, accessibleIndent.length() - String.valueOf(this.isAccessible()).length()) + "$" + (daysRented * rentalAmount);
+    }
 }

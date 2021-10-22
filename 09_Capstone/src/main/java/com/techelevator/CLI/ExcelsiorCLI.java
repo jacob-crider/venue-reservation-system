@@ -11,6 +11,7 @@ import com.techelevator.DAO.jdbc.JDBCVenueDAO;
 import com.techelevator.view.Menu;
 import org.apache.commons.dbcp2.BasicDataSource;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class ExcelsiorCLI {
@@ -63,7 +64,8 @@ public class ExcelsiorCLI {
 			if (userInput.equalsIgnoreCase("R")) {
 				break;
 			} else if (Integer.parseInt(userInput) - 1 <= venueDAO.listVenues().size()) {
-				Venue venue = venueDAO.listVenues().get(Integer.parseInt(userInput) - 1);
+				List<Venue> venues = venueDAO.listVenues();
+				Venue venue = venues.get(Integer.parseInt(userInput) - 1);
 				menu.displayChosenVenue(venue);
 				viewVenueSpaces(venue);
 			} else {
@@ -102,13 +104,40 @@ public class ExcelsiorCLI {
 	}
 
 	public void searchForReservationParameters(Venue venue) {
-		String userInputForDate = menu.askUserForDateNeeded();
-		String userInputForDaysNeeded = menu.askUserForDaysNeeded();
-		String numberOfAttendees = menu.askUserForAttendees();
+		while (true) {
+			String userInputForDate = menu.askUserForDateNeeded();
+			String userInputForDaysNeeded = menu.askUserForDaysNeeded();
+			String numberOfAttendees = menu.askUserForAttendees();
 
-		List<Space> spacesAvailable = spaceDAO.listAvailableSpaces(venue, userInputForDate, numberOfAttendees, userInputForDaysNeeded);
-		menu.listSpacesFittingUserNeeds(spacesAvailable, Integer.parseInt(userInputForDaysNeeded));
-		menu.inputFromUser();
+			String[] dateArray = userInputForDate.split("/");
+			LocalDate startingReservationDate = LocalDate.of(Integer.parseInt(dateArray[2]), Integer.parseInt(dateArray[0]), Integer.parseInt(dateArray[1]));
+			LocalDate endingReservationDate = startingReservationDate.plusDays(Integer.parseInt(userInputForDaysNeeded));
+
+			List<Space> spacesAvailable = spaceDAO.listAvailableSpaces(venue, userInputForDate, numberOfAttendees, startingReservationDate, endingReservationDate);
+			if (spacesAvailable.isEmpty()) {
+
+			} else {
+				menu.listSpacesFittingUserNeeds(spacesAvailable, Integer.parseInt(userInputForDaysNeeded));
+				String reserveOrCancelDecision = menu.reserveOrCancel();
+			}
+		}
 	}
 
+	public void reservation(String userInput, Space space) {
+		if (userInput.equals("0")) {
+
+		} else if (userInput.equals(space.getSpaceId())) {
+
+		}
+	}
+
+	public Space searchListForSpaceId(long spaceId, List<Space> spacesAvailable) {
+		Space spaceInList = null;
+		for (Space space : spacesAvailable) {
+			if (spaceId == space.getSpaceId()) {
+				return space;
+			}
+		}
+		return spaceInList;
+	}
 }

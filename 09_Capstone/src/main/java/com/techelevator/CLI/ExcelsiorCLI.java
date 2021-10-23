@@ -46,6 +46,7 @@ public class ExcelsiorCLI {
 
 	public void mainMenuDecision() {
 		loop1: while(true) {
+			menuSwitch = true;
 			menu.mainMenu();
 			String userInput = menu.inputFromUser();
 			if (userInput.equals("1")) {
@@ -59,7 +60,7 @@ public class ExcelsiorCLI {
 	}
 
 	public void venueMenuDecision() {
-		loop2: while (true) {
+		loop2: while (menuSwitch) {
 			menu.displayVenues(venueDAO.listVenues());
 			String userInput = menu.inputFromUser();
 			if (userInput.equalsIgnoreCase("R")) {
@@ -76,7 +77,7 @@ public class ExcelsiorCLI {
 	}
 
 	public void viewVenueSpaces(Venue venue) {
-		loop3: while(true) {
+		loop3: while(menuSwitch) {
 			menu.viewVenueSpacesMenu();
 			String userInput = menu.inputFromUser();
 			if (userInput.equalsIgnoreCase("R")) {
@@ -90,7 +91,7 @@ public class ExcelsiorCLI {
 	}
 
 	public void reserveSpaceMenu(Venue venue) {
-		loop4: while(true) {
+		loop4: while(menuSwitch) {
 			menu.viewSpaces(venue, spaceDAO.listSpaces(venue));
 			menu.reserveSpaceMenu();
 			String userInput = menu.inputFromUser();
@@ -105,7 +106,7 @@ public class ExcelsiorCLI {
 	}
 
 	public void searchForReservationParameters(Venue venue) {
-		loop5: while (true) {
+		loop5: while (menuSwitch) {
 			String userInputForDate = menu.askUserForDateNeeded();
 			String userInputForDaysNeeded = menu.askUserForDaysNeeded();
 			String numberOfAttendees = menu.askUserForAttendees();
@@ -120,7 +121,7 @@ public class ExcelsiorCLI {
 					if (searchAgain.equalsIgnoreCase("Y")) {
 
 					} else {
-						mainMenuDecision();
+						menuSwitch = false;
 					}
 			} else {
 				List<Space> spacesWithoutConflictingReservations = new ArrayList<>();
@@ -142,9 +143,9 @@ public class ExcelsiorCLI {
 	}
 
 	public void reservation(String userInput, List<Space> spacesAvailable, Reservation reservation, int numberOfDaysNeeded) {
-		loop6: while (true) {
+		loop6: while (menuSwitch) {
 			if (userInput.equals("0")) {
-					mainMenuDecision();
+					menuSwitch = false;
 			} else {
 					Space spaceUserSelected = searchListForSpaceId(Long.parseLong(userInput), spacesAvailable);
 					if (spaceUserSelected == null) {
@@ -157,7 +158,7 @@ public class ExcelsiorCLI {
 						Venue venue = venueDAO.returnVenueBySpaceId(spaceUserSelected.getSpaceId());
 						addedReservation.setVenueName(venue.getName());
 						menu.reservationDetails(addedReservation);
-						mainMenuDecision();
+						menuSwitch = false;
 					}
 			}
 		}

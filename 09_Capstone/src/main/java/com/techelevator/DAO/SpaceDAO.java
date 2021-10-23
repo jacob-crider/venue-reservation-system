@@ -8,5 +8,5 @@ public interface SpaceDAO {
 
     List<Space> listSpaces(Venue venue);
 
-    List<Space> listAvailableSpaces(Venue venue, String dateRequested, String attendees, LocalDate startDate, LocalDate endDate);
+    List<Space> listAvailableSpaces(Venue venue, String dateRequested, String attendees, LocalDate startDateRequested, LocalDate endDateRequested);
 }

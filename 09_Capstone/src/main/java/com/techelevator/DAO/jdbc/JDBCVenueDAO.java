@@ -29,6 +29,17 @@ public class JDBCVenueDAO implements VenueDAO {
         return venues;
     }
 
+    @Override
+    public Venue returnVenueBySpaceId(long spaceId) {
+            String sql = "SELECT venue.id, venue.name, city.name AS city_name, venue.description, state.abbreviation FROM venue JOIN city ON city.id = venue.city_id JOIN state ON city.state_abbreviation = state.abbreviation JOIN space ON venue.id = space.venue_id WHERE space.id = ?";
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, spaceId);
+            Venue venue = new Venue();
+            while (results.next()) {
+                venue = mapRowToVenue(results);
+            }
+            return venue;
+    }
+
     private Venue mapRowToVenue(SqlRowSet row) {
         Venue venue = new Venue();
         venue.setVenue_id(row.getLong("id"));

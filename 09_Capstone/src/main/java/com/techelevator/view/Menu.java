@@ -1,5 +1,6 @@
 package com.techelevator.view;
 
+import com.techelevator.DAO.Reservation;
 import com.techelevator.DAO.Space;
 import com.techelevator.DAO.Venue;
 
@@ -106,8 +107,32 @@ public class Menu {
 
     public String reserveOrCancel() {
         System.out.println();
-        System.out.println("Which space would you like to reserve?");
+        System.out.println("Which space would you like to reserve (enter 0 to cancel)?");
         return inputFromUser();
+    }
+
+    public String noSearchResults() {
+        System.out.println("There are no available spaces given your needs. Search again? (Y) / (N)");
+        return inputFromUser();
+    }
+
+    public String reservationName() {
+        System.out.println("Who is the reservation for?");
+        return inputFromUser();
+    }
+
+    public void reservationDetails(Reservation reservation) {
+        System.out.println();
+        System.out.println("Thanks for submitting your reservation! Details for your event are listed below: ");
+        System.out.println();
+        System.out.println("Confirmation #: " + reservation.getReservation_id());
+        System.out.println("Venue: " + reservation.getVenueName());
+        System.out.println("Space: " + reservation.getSpaceName());
+        System.out.println("Reserved For: " + reservation.getReservedFor());
+        System.out.println("Attendees: " + reservation.getNumberOfAttendees());
+        System.out.println("Arrival Date: " + reservation.getStartDate());
+        System.out.println("Depart Date: " + reservation.getEndDate());
+        System.out.println("Total Cost: $" + reservation.getTotalCost());
     }
 
 }

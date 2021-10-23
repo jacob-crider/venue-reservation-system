@@ -2,17 +2,17 @@ package com.techelevator.CLI;
 
 import javax.sql.DataSource;
 
-import com.techelevator.DAO.Space;
-import com.techelevator.DAO.SpaceDAO;
-import com.techelevator.DAO.Venue;
-import com.techelevator.DAO.VenueDAO;
+import com.techelevator.DAO.*;
+import com.techelevator.DAO.jdbc.JDBCReservationDAO;
 import com.techelevator.DAO.jdbc.JDBCSpaceDAO;
 import com.techelevator.DAO.jdbc.JDBCVenueDAO;
 import com.techelevator.view.Menu;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ExcelsiorCLI {
 
@@ -21,6 +21,7 @@ public class ExcelsiorCLI {
 	private Menu menu = new Menu();
 	private VenueDAO venueDAO;
 	private boolean menuSwitch = true;
+	private ReservationDAO reservationDAO;
 
 	public static void main(String[] args) {
 		BasicDataSource dataSource = new BasicDataSource();
@@ -35,16 +36,16 @@ public class ExcelsiorCLI {
 	public ExcelsiorCLI(DataSource datasource) {
 		venueDAO = new JDBCVenueDAO(datasource);
 		spaceDAO = new JDBCSpaceDAO(datasource);
+		reservationDAO = new JDBCReservationDAO(datasource);
 	}
 
 	public void run() {
 
 			mainMenuDecision();
-
 	}
 
 	public void mainMenuDecision() {
-		while(true) {
+		loop1: while(true) {
 			menu.mainMenu();
 			String userInput = menu.inputFromUser();
 			if (userInput.equals("1")) {
@@ -58,11 +59,11 @@ public class ExcelsiorCLI {
 	}
 
 	public void venueMenuDecision() {
-		while (true) {
+		loop2: while (true) {
 			menu.displayVenues(venueDAO.listVenues());
 			String userInput = menu.inputFromUser();
 			if (userInput.equalsIgnoreCase("R")) {
-				break;
+				break loop2;
 			} else if (Integer.parseInt(userInput) - 1 <= venueDAO.listVenues().size()) {
 				List<Venue> venues = venueDAO.listVenues();
 				Venue venue = venues.get(Integer.parseInt(userInput) - 1);
@@ -75,7 +76,7 @@ public class ExcelsiorCLI {
 	}
 
 	public void viewVenueSpaces(Venue venue) {
-		while(true) {
+		loop3: while(true) {
 			menu.viewVenueSpacesMenu();
 			String userInput = menu.inputFromUser();
 			if (userInput.equalsIgnoreCase("R")) {
@@ -89,7 +90,7 @@ public class ExcelsiorCLI {
 	}
 
 	public void reserveSpaceMenu(Venue venue) {
-		while(true) {
+		loop4: while(true) {
 			menu.viewSpaces(venue, spaceDAO.listSpaces(venue));
 			menu.reserveSpaceMenu();
 			String userInput = menu.inputFromUser();
@@ -104,7 +105,7 @@ public class ExcelsiorCLI {
 	}
 
 	public void searchForReservationParameters(Venue venue) {
-		while (true) {
+		loop5: while (true) {
 			String userInputForDate = menu.askUserForDateNeeded();
 			String userInputForDaysNeeded = menu.askUserForDaysNeeded();
 			String numberOfAttendees = menu.askUserForAttendees();
@@ -115,19 +116,50 @@ public class ExcelsiorCLI {
 
 			List<Space> spacesAvailable = spaceDAO.listAvailableSpaces(venue, userInputForDate, numberOfAttendees, startingReservationDate, endingReservationDate);
 			if (spacesAvailable.isEmpty()) {
+					String searchAgain = menu.noSearchResults();
+					if (searchAgain.equalsIgnoreCase("Y")) {
 
+					} else {
+						mainMenuDecision();
+					}
 			} else {
-				menu.listSpacesFittingUserNeeds(spacesAvailable, Integer.parseInt(userInputForDaysNeeded));
+				List<Space> spacesWithoutConflictingReservations = new ArrayList<>();
+				for (Space space : spacesAvailable) {
+					List<Reservation> reservations = reservationDAO.listReservationsBySpaceIdWithScheduleConflict(space, startingReservationDate, endingReservationDate);
+					if (reservations.isEmpty()) {
+						spacesWithoutConflictingReservations.add(space);
+					}
+				}
+				menu.listSpacesFittingUserNeeds(spacesWithoutConflictingReservations, Integer.parseInt(userInputForDaysNeeded));
 				String reserveOrCancelDecision = menu.reserveOrCancel();
+				Reservation reservation = new Reservation();
+				reservation.setNumberOfAttendees(Integer.parseInt(numberOfAttendees));
+				reservation.setEndDate(endingReservationDate);
+				reservation.setStartDate(startingReservationDate);
+				reservation(reserveOrCancelDecision, spacesWithoutConflictingReservations, reservation, Integer.parseInt(userInputForDaysNeeded));
 			}
 		}
 	}
 
-	public void reservation(String userInput, Space space) {
-		if (userInput.equals("0")) {
-
-		} else if (userInput.equals(space.getSpaceId())) {
-
+	public void reservation(String userInput, List<Space> spacesAvailable, Reservation reservation, int numberOfDaysNeeded) {
+		loop6: while (true) {
+			if (userInput.equals("0")) {
+					mainMenuDecision();
+			} else {
+					Space spaceUserSelected = searchListForSpaceId(Long.parseLong(userInput), spacesAvailable);
+					if (spaceUserSelected == null) {
+						menu.invalidInputMessage();
+					} else {
+						String nameOnReservation = menu.reservationName();
+						Reservation addedReservation = reservationDAO.addReservation(spaceUserSelected, reservation.getNumberOfAttendees(), reservation.getStartDate(), reservation.getEndDate(), nameOnReservation);
+						addedReservation.setTotalCost(spaceUserSelected.getDailyRate() * numberOfDaysNeeded);
+						addedReservation.setSpaceName(spaceUserSelected.getName());
+						Venue venue = venueDAO.returnVenueBySpaceId(spaceUserSelected.getSpaceId());
+						addedReservation.setVenueName(venue.getName());
+						menu.reservationDetails(addedReservation);
+						mainMenuDecision();
+					}
+			}
 		}
 	}
 

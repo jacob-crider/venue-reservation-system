@@ -3,11 +3,13 @@ package com.techelevator.DAO.jdbc;
 import com.techelevator.DAO.Reservation;
 import com.techelevator.DAO.ReservationDAO;
 import com.techelevator.DAO.Space;
-import jdk.vm.ci.meta.Local;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JDBCReservationDAO implements ReservationDAO {
 
@@ -31,6 +33,19 @@ public class JDBCReservationDAO implements ReservationDAO {
         reservation.setReservation_id(reservationId);
 
         return reservation;
+    }
+
+    @Override
+    public List<Reservation> listReservationsBySpaceIdWithScheduleConflict(Space space, LocalDate startingDateRequested, LocalDate endingDateRequested) {
+            List<Reservation> reservations = new ArrayList<>();
+            String sql = "SELECT * FROM reservation WHERE space_id = ? AND ((start_date < ?  AND ? < end_date) OR (start_date < ? AND ? < end_date))";
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, space.getSpaceId(), startingDateRequested, startingDateRequested, endingDateRequested, endingDateRequested);
+            while(results.next()) {
+                Reservation reservation = new Reservation();
+                reservation.setSpace_id(space.getSpaceId());
+                reservations.add(reservation);
+            }
+            return reservations;
     }
 
 }

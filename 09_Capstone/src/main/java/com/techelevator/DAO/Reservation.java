@@ -10,6 +10,9 @@ public class Reservation {
     private LocalDate startDate;
     private LocalDate endDate;
     private String reservedFor;
+    private String venueName;
+    private String spaceName;
+    private double totalCost;
 
     public long getReservation_id() {
         return reservation_id;
@@ -57,5 +60,29 @@ public class Reservation {
 
     public void setReservedFor(String reservedFor) {
         this.reservedFor = reservedFor;
+    }
+
+    public String getVenueName() {
+        return venueName;
+    }
+
+    public void setVenueName(String venueName) {
+        this.venueName = venueName;
+    }
+
+    public String getSpaceName() {
+        return spaceName;
+    }
+
+    public void setSpaceName(String spaceName) {
+        this.spaceName = spaceName;
+    }
+
+    public double getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(double totalCost) {
+        this.totalCost = totalCost;
     }
 }

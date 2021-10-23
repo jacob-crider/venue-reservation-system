@@ -1,5 +1,6 @@
 package com.techelevator.DAO.jdbc;
 
+import com.techelevator.DAO.Reservation;
 import com.techelevator.DAO.Space;
 import com.techelevator.DAO.SpaceDAO;
 import com.techelevator.DAO.Venue;
@@ -31,23 +32,14 @@ public class JDBCSpaceDAO implements SpaceDAO {
     }
 
     @Override
-    public List<Space> listAvailableSpaces(Venue venue, String dateRequested, String attendees, LocalDate startDate, LocalDate endDate) {
+    public List<Space> listAvailableSpaces(Venue venue, String dateRequested, String attendees, LocalDate startDateRequested, LocalDate endDateRequested) {
         String[] dateArray = dateRequested.split("/");
         String monthRequested = dateArray[0];
-
         List<Space> spaces = new ArrayList<>();
-        String sql = "SELECT DISTINCT id, venue_id, name, is_accessible, open_from, open_to, daily_rate::decimal, max_occupancy FROM space JOIN reservation ON space.id = reservation.space_id WHERE venue_id = ? AND max_occupancy >= ? AND open_from IS NOT NULL AND open_to IS NOT NULL AND open_from <= ? AND open_to >= ? AND ((? < start_date AND ? < start_date) OR ? > end_date) LIMIT 5";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, venue.getVenue_id(), Integer.parseInt(attendees), Integer.parseInt(monthRequested), Integer.parseInt(monthRequested), startDate, endDate, startDate);
+        String sql = "SELECT id, venue_id, name, is_accessible, open_from, open_to, daily_rate::decimal, max_occupancy FROM space WHERE venue_id = ? AND max_occupancy >= ? AND ((open_from IS NULL AND open_to IS NULL) OR (open_from <= ? AND open_to >= ?))";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, venue.getVenue_id(), Integer.parseInt(attendees), Integer.parseInt(monthRequested), Integer.parseInt(monthRequested));
         while(results.next()) {
             spaces.add(mapRowToSpace(results));
-        }
-        String sqlTwo = "SELECT DISTINCT id, venue_id, name, is_accessible, open_from, open_to, daily_rate::decimal, max_occupancy FROM space JOIN reservation ON space.id = reservation.space_id WHERE venue_id = ? AND max_occupancy >= ? AND open_from IS NULL AND open_to IS NULL AND ((? < start_date AND ? < start_date) OR ? > end_date) LIMIT 5";
-        SqlRowSet resultsTwo = jdbcTemplate.queryForRowSet(sqlTwo, venue.getVenue_id(), Integer.parseInt(attendees), startDate, endDate, startDate);
-        while(resultsTwo.next()) {
-           Space space = mapRowToSpace(resultsTwo);
-           if (!spaces.contains(space)) {
-                spaces.add(space);
-           }
         }
         return spaces;
     }

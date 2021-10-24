@@ -38,7 +38,7 @@ public class JDBCReservationDAO implements ReservationDAO {
     @Override
     public List<Reservation> listReservationsBySpaceIdWithScheduleConflict(Space space, LocalDate startingDateRequested, LocalDate endingDateRequested) {
             List<Reservation> reservations = new ArrayList<>();
-            String sql = "SELECT * FROM reservation WHERE space_id = ? AND ((start_date < ?  AND ? < end_date) OR (start_date < ? AND ? < end_date))";
+            String sql = "SELECT * FROM reservation WHERE space_id = ? AND ((start_date <= ?  AND ? <= end_date) OR (start_date <= ? AND ? <= end_date))";
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, space.getSpaceId(), startingDateRequested, startingDateRequested, endingDateRequested, endingDateRequested);
             while(results.next()) {
                 Reservation reservation = new Reservation();

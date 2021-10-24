@@ -150,6 +150,7 @@ public class ExcelsiorCLI {
 					Space spaceUserSelected = searchListForSpaceId(Long.parseLong(userInput), spacesAvailable);
 					if (spaceUserSelected == null) {
 						menu.invalidInputMessage();
+						break;
 					} else {
 						String nameOnReservation = menu.reservationName();
 						Reservation addedReservation = reservationDAO.addReservation(spaceUserSelected, reservation.getNumberOfAttendees(), reservation.getStartDate(), reservation.getEndDate(), nameOnReservation);
